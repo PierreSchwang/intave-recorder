@@ -50,8 +50,7 @@ class WebInterface {
 
     val commandRepository = CommandRepository()
 
-    // TODO: Config for the database
-    var driver = MongoDriver("localhost", 27017)
+    var driver = MongoDriver(jsonConfig.mongoDBConfig.ip, jsonConfig.mongoDBConfig.port)
 
     private val app = Javalin.create().routes {
         // Default endpoint

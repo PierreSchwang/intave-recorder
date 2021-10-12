@@ -84,7 +84,7 @@ class MongoDriver(
         passwordCollection.insertOne(passwordEntity)
     }
 
-    override fun passwordByPassword(id: String): PasswordEntity? {
+    override fun passwordById(id: String): PasswordEntity? {
         return passwordCollection.find(
             PasswordQuery(
                 PasswordQueryType.PASSWORD_ID,

@@ -51,7 +51,7 @@ class PasswordCommand : Command() {
                 // Get the wanted id
                 val id = args[0]
                 // Check if there is a valid password entity
-                val passwordEntity = webinterface.driver.passwordByPassword(id) ?: run {
+                val passwordEntity = webinterface.driver.passwordById(id) ?: run {
                     println("${ANSI_RED}This password could not be found!${ANSI_GRAY}")
                     return@subcommand
                 }

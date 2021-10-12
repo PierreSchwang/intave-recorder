@@ -32,7 +32,7 @@ interface Driver {
      * @param id The requested record id
      * @return Password entity found in the database or null
      */
-    fun passwordByPassword(id: String): PasswordEntity?
+    fun passwordById(id: String): PasswordEntity?
 
     /**
      * Fetches a password by a browser fingerprint
