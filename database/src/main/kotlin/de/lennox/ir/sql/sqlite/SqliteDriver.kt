@@ -13,7 +13,7 @@ class SqliteDriver(
     private var resolver: Supplier<Connection>
 
     init {
-        if (!database.parentFile.exists()) {
+        if (database.parentFile != null && !database.parentFile.exists()) {
             database.parentFile.mkdirs()
         }
         if (!database.exists()) {

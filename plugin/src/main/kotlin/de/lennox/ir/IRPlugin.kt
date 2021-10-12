@@ -2,11 +2,13 @@ package de.lennox.ir
 
 import de.lennox.ir.command.CommandRegistry
 import de.lennox.ir.command.RecorderCommand
+import de.lennox.ir.config.Config
+import de.lennox.ir.config.DatabaseType
 import de.lennox.ir.event.EventRegistry
 import de.lennox.ir.intave.IntaveAccessListener
 import de.lennox.ir.intave.IntaveViolationCache
-import de.lennox.ir.mongodb.MongoDriver
 import org.bukkit.plugin.java.JavaPlugin
+import java.io.File
 
 lateinit var plugin: IRPlugin;
 
@@ -16,12 +18,21 @@ class IRPlugin : JavaPlugin() {
     override fun onEnable() {
         println("Enabling Intave Recorder")
         plugin = this
+
+        val config = Config(File(dataFolder, "database.json")).config
+        // Initialize the driver
+        val type = DatabaseType.byConfigValue(config.databaseType)
+        if (type == null) {
+            logger.severe("Invalid database type parameter ${config.databaseType}")
+            logger.severe("Available options are: ${DatabaseType.values().contentToString()}")
+            pluginLoader.disablePlugin(this)
+            return
+        }
+        driver = type.driverFunction(config)
+
         // Register all necessary objects
         registerEvents()
         registerCommands()
-        // Initialize the driver
-        // TODO: Config for the driver
-        driver = MongoDriver("localhost", 27017)
     }
 
     private fun registerEvents() {

@@ -1,8 +1,12 @@
 package de.lennox.ir.web.json
 
-import de.lennox.ir.web.gson
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import java.io.File
 
+val gson: Gson = GsonBuilder()
+    .setPrettyPrinting()
+    .create()
 open class JsonConfig(configFile: File) {
 
     val file = configFile

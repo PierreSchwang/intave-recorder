@@ -2,7 +2,9 @@ package de.lennox.ir.web
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import de.lennox.ir.mongodb.MongoDriver
+import de.lennox.ir.Driver
+import de.lennox.ir.config.Config
+import de.lennox.ir.config.DatabaseType
 import de.lennox.ir.web.command.CommandDispatcher
 import de.lennox.ir.web.command.CommandRepository
 import de.lennox.ir.web.json.DelegateJsonConfig
@@ -13,10 +15,7 @@ import io.javalin.core.JavalinServer
 import java.io.File
 import java.util.*
 import java.util.concurrent.Executors
-
-val gson: Gson = GsonBuilder()
-    .setPrettyPrinting()
-    .create()
+import kotlin.system.exitProcess
 
 inline fun <reified T> jsonConfig(configPath: File, default: T): DelegateJsonConfig<T> =
     DelegateJsonConfig(configPath, T::class.java, default)
@@ -31,17 +30,11 @@ class WebInterface {
         File("config.json"),
         WIConfig(
             8080,
-            "https://intave.de",
-            MongoDBConfig(
-                "",
-                0,
-                false,
-                "",
-                "",
-                ""
-            )
+            "https://intave.de"
         )
     )
+    private var databaseConfig = Config(File("database.yml")).config
+
     private val baseHtmlFile: String =
         String(JavalinServer::class.java.getResourceAsStream("/index.html")?.readBytes()!!)
     private val baseLoginFile: String =
@@ -50,7 +43,17 @@ class WebInterface {
 
     val commandRepository = CommandRepository()
 
-    var driver = MongoDriver(jsonConfig.mongoDBConfig.ip, jsonConfig.mongoDBConfig.port)
+    var driver: Driver
+
+    init {
+        val type = DatabaseType.byConfigValue(databaseConfig.databaseType)
+        if (type == null) {
+            System.err.println("Invalid database type parameter ${databaseConfig.databaseType}")
+            System.err.println("Available options are: ${DatabaseType.values().contentToString()}")
+            exitProcess(2)
+        }
+        driver = type.driverFunction(databaseConfig)
+    }
 
     private val app = Javalin.create().routes {
         // Default endpoint
