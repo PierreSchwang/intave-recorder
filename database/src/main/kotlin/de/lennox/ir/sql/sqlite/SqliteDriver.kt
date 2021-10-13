@@ -19,9 +19,11 @@ class SqliteDriver(
         if (!database.exists()) {
             database.createNewFile()
         }
+        Class.forName("org.sqlite.JDBC")
         resolver = Supplier {
             DriverManager.getConnection("jdbc:sqlite:$database")
         }
+        migrate()
     }
 
     override fun getConnection(): Connection {
